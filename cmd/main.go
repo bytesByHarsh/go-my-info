@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/bytesByHarsh/go-my-info/config"
+	db "github.com/bytesByHarsh/go-my-info/database"
 	"github.com/bytesByHarsh/go-my-info/router"
 	"github.com/gofiber/fiber/v3"
 )
@@ -22,6 +23,8 @@ func main() {
 	// log.Printf("Starting Server at: %v:%v", config.Cfg.SERVER_LINK, config.Cfg.SERVER_PORT)
 
 	serverAddr := fmt.Sprintf("%v:%v", config.Cfg.SERVER_LINK, config.Cfg.SERVER_PORT)
+
+	db.ConnectDb()
 
 	router.SetupRoutes(app)
 	log.Fatalf("Closing Server: %v", app.Listen(serverAddr, fiber.ListenConfig{EnablePrefork: true}))
