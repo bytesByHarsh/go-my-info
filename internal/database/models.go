@@ -18,9 +18,10 @@ type User struct {
 	DeletedAt      sql.NullTime
 	IsDeleted      bool
 	Name           string
-	PhoneNum       sql.NullString
+	PhoneNum       string
 	Email          string
-	ProfileImg     sql.NullString
+	Username       string
+	ProfileImg     string
 	Role           int32
-	HashedPassword sql.NullString
+	HashedPassword string
 }

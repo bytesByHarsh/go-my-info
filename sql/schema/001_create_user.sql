@@ -6,11 +6,12 @@ CREATE TABLE users (
     deleted_at TIMESTAMPTZ DEFAULT NULL,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
     name VARCHAR(100) NOT NULL,
-    phone_num VARCHAR(15),
+    phone_num VARCHAR(15) NOT NULL,
     email VARCHAR(200) NOT NULL UNIQUE,
-    profile_img TEXT,
+    username VARCHAR(200) NOT NULL UNIQUE,
+    profile_img TEXT NOT NULL,
     role INTEGER NOT NULL,
-    hashed_password VARCHAR(100)
+    hashed_password VARCHAR(100) NOT NULL
 );
 
 -- +goose Down

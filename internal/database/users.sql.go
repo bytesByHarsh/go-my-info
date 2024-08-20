@@ -16,10 +16,10 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO users(id, created_at, updated_at,
                   deleted_at, is_deleted,
-                  name, phone_num, email,
+                  name, phone_num, email, username,
                   profile_img, role, hashed_password)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-RETURNING id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, profile_img, role, hashed_password
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+RETURNING id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password
 `
 
 type CreateUserParams struct {
@@ -29,11 +29,12 @@ type CreateUserParams struct {
 	DeletedAt      sql.NullTime
 	IsDeleted      bool
 	Name           string
-	PhoneNum       sql.NullString
+	PhoneNum       string
 	Email          string
-	ProfileImg     sql.NullString
+	Username       string
+	ProfileImg     string
 	Role           int32
-	HashedPassword sql.NullString
+	HashedPassword string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -46,6 +47,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.Name,
 		arg.PhoneNum,
 		arg.Email,
+		arg.Username,
 		arg.ProfileImg,
 		arg.Role,
 		arg.HashedPassword,
@@ -60,6 +62,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Name,
 		&i.PhoneNum,
 		&i.Email,
+		&i.Username,
 		&i.ProfileImg,
 		&i.Role,
 		&i.HashedPassword,

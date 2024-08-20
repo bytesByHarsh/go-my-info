@@ -8,6 +8,10 @@ import (
 
 func SetupRoutes(app *fiber.App) {
 	// Middleware
-	api := app.Group("/api", logger.New())
-	api.Get("/", handler.Hello)
+	v1 := app.Group("/v1", logger.New())
+	v1.Get("/", handler.Hello)
+
+	// User
+	user := v1.Group("/user")
+	user.Post("/", handler.CreateUser)
 }
