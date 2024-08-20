@@ -1,0 +1,6 @@
+go-my-info
+.vscode/
+.env
+thuder-tests/
+tmp/
+main
