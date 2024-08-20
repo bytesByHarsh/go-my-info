@@ -2,7 +2,10 @@ module github.com/bytesByHarsh/go-my-info
 
 go 1.22.6
 
-require github.com/gofiber/fiber/v3 v3.0.0-beta.3
+require (
+	github.com/gofiber/fiber/v3 v3.0.0-beta.3
+	github.com/joho/godotenv v1.5.1
+)
 
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
