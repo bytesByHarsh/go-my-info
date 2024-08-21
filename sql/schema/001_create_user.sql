@@ -11,7 +11,7 @@ CREATE TABLE users (
     username VARCHAR(200) NOT NULL UNIQUE,
     profile_img TEXT NOT NULL,
     role INTEGER NOT NULL,
-    hashed_password VARCHAR(100) NOT NULL
+    hashed_password TEXT NOT NULL
 );
 
 -- +goose Down

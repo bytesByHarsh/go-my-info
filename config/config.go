@@ -12,6 +12,8 @@ type EnvConfig struct {
 	SERVER_PORT string
 	SERVER_LINK string
 	DB_URL      string
+
+	SECRET_KEY string
 }
 
 var Cfg EnvConfig
@@ -29,6 +31,7 @@ func ReadEnvFile(envPath string) {
 	Cfg.SERVER_LINK = os.Getenv("SERVER_LINK")
 	Cfg.SERVER_PORT = os.Getenv("SERVER_PORT")
 	Cfg.DB_URL = os.Getenv("DB_URL")
+	Cfg.SECRET_KEY = os.Getenv("SECRET_KEY")
 
 	if Cfg.SERVER_LINK == "" {
 		Cfg.SERVER_LINK = "localhost"
