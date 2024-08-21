@@ -2,16 +2,19 @@ package router
 
 import (
 	"github.com/bytesByHarsh/go-my-info/handler"
-	"github.com/gofiber/fiber/v3"
-	"github.com/gofiber/fiber/v3/middleware/logger"
+	"github.com/go-chi/chi/v5"
 )
 
-func SetupRoutes(app *fiber.App) {
+func SetupRoutes(app *chi.Mux) {
+	handler.Init()
 	// Middleware
-	v1 := app.Group("/v1", logger.New())
-	v1.Get("/", handler.Hello)
+	v1Router := chi.NewRouter()
+	v1Router.Get("/", handler.Hello)
 
 	// User
-	user := v1.Group("/user")
-	user.Post("/", handler.CreateUser)
+	userRouter := chi.NewRouter()
+	userRouter.Post("/register", handler.CreateUser)
+
+	v1Router.Mount("/user", userRouter)
+	app.Mount("/v1", v1Router)
 }

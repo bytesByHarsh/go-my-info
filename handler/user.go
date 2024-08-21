@@ -4,69 +4,73 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
-	"log"
+	"net/http"
 	"time"
 
 	"github.com/bytesByHarsh/go-my-info/config"
 	"github.com/bytesByHarsh/go-my-info/internal/database"
 	"github.com/bytesByHarsh/go-my-info/models"
-	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
 )
 
-func CreateUser(c fiber.Ctx) error {
+func CreateUser(w http.ResponseWriter, r *http.Request) {
 
-	type NewUser struct {
+	type parameters struct {
 		Username string `json:"username" validate:"required"`
 		Email    string `json:"email" validate:"required"`
 		Name     string `json:"name" validate:"required"`
 		Password string `json:"password" validate:"required"`
 	}
 
-	user := new(NewUser)
+	params := parameters{}
 
-	if err := c.Bind().Body(user); err != nil {
-		log.Printf("Parse Error: %v", err)
-		return fiber.NewError(fiber.StatusBadRequest, "wrong values sent")
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		responseWithError(w, http.StatusBadRequest,
+			fmt.Sprintf("Error parsing JSON: %v", err),
+		)
+		return
 	}
 
-	start := time.Now()
-	hash := hashPassword(user.Password)
-	// if err != nil {
-	// 	return fiber.NewError(fiber.StatusBadRequest, "Password Input issue")
-	// }
-	end := time.Now()
-	fmt.Printf("myFunction took %v to complete.\n", end.Sub(start))
+	// Validate the struct
+	if err := validate.Struct(params); err != nil {
+		responseWithError(w, http.StatusBadRequest,
+			fmt.Sprintf("Error parsing JSON: %v", err),
+		)
+		return
+	}
 
-	start = time.Now()
-	// log.Printf("User Details: %v", user)
-	dbUser, err := apiCfg.DB.CreateUser(c.Context(), database.CreateUserParams{
+	hash := hashPassword(params.Password)
+
+	dbUser, err := apiCfg.DB.CreateUser(r.Context(), database.CreateUserParams{
 		ID:             uuid.New(),
 		CreatedAt:      time.Now().UTC(),
 		UpdatedAt:      time.Now().UTC(),
 		DeletedAt:      sql.NullTime{},
 		IsDeleted:      false,
-		Name:           user.Name,
-		Email:          user.Email,
-		Username:       user.Username,
+		Name:           params.Name,
+		Email:          params.Email,
+		Username:       params.Username,
 		PhoneNum:       "",
 		ProfileImg:     "",
 		Role:           10,
 		HashedPassword: hash,
 	})
-	end = time.Now()
-	fmt.Printf("myFunction took %v to complete.\n", end.Sub(start))
 
 	if err != nil {
-		return fiber.NewError(fiber.StatusUnprocessableEntity, fmt.Sprintf("Err: %v", err))
+		responseWithError(w, 400,
+			fmt.Sprintf("couldn't create user: %v", err),
+		)
+		return
 	}
 
-	return c.JSON(fiber.Map{
-		"status":  "success",
-		"message": "Created user",
-		"data":    models.ConvUserToUser(dbUser),
-	})
+	resp := models.JSONResp{
+		Status:  "success",
+		Message: "User Created",
+		Data:    models.ConvUserToUser(dbUser),
+	}
+	responseWithJson(w, 201, resp)
 }
 
 func hashPassword(password string) string {
