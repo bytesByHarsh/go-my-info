@@ -3,31 +3,17 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/bytesByHarsh/go-my-info/config"
 	db "github.com/bytesByHarsh/go-my-info/database"
 	"github.com/bytesByHarsh/go-my-info/router"
-	"github.com/go-playground/validator/v10"
-	"github.com/gofiber/fiber/v3"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 )
 
-type structValidator struct {
-	validate *validator.Validate
-}
-
-// Validator needs to implement the Validate method
-func (v *structValidator) Validate(out any) error {
-	return v.validate.Struct(out)
-}
-
 func main() {
-	app := fiber.New(fiber.Config{
-		CaseSensitive:   false,
-		StrictRouting:   false,
-		ServerHeader:    "Fiber",
-		AppName:         "My Info",
-		StructValidator: &structValidator{validate: validator.New()},
-	})
 
 	config.ReadEnvFile(".env")
 
@@ -37,6 +23,25 @@ func main() {
 
 	db.ConnectDb()
 
+	app := chi.NewRouter()
+	app.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"*"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
+	app.Use(middleware.RequestID)
+	app.Use(middleware.Logger)
+	app.Use(middleware.Recoverer)
+	// app.Use(middleware.StripSlashes)
+	app.Use(middleware.Heartbeat("/ping"))
+
 	router.SetupRoutes(app)
-	log.Fatalf("Closing Server: %v", app.Listen(serverAddr, fiber.ListenConfig{EnablePrefork: true}))
+	log.Printf("Server Starting on Address: %v", serverAddr)
+	err := http.ListenAndServe(serverAddr, app)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
