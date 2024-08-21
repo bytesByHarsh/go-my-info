@@ -14,6 +14,8 @@ func SetupRoutes(app *chi.Mux) {
 	// User
 	userRouter := chi.NewRouter()
 	userRouter.Post("/register", handler.CreateUser)
+	userRouter.Post("/login", handler.LoginUser)
+	userRouter.Get("/me", handler.MiddlewareAuth(handler.GetUser))
 
 	v1Router.Mount("/user", userRouter)
 	app.Mount("/v1", v1Router)

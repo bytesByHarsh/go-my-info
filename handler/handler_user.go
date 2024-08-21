@@ -73,6 +73,10 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	responseWithJson(w, 201, resp)
 }
 
+func GetUser(w http.ResponseWriter, r *http.Request, user database.User) {
+	responseWithJson(w, http.StatusOK, models.ConvUserToUser(user))
+}
+
 func hashPassword(password string) string {
 	// bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	// return string(bytes), err
