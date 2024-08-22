@@ -11,6 +11,7 @@ import (
 	"github.com/bytesByHarsh/go-my-info/config"
 	"github.com/bytesByHarsh/go-my-info/internal/database"
 	"github.com/bytesByHarsh/go-my-info/models"
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
 
@@ -60,6 +61,132 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 func GetUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	responseWithJson(w, http.StatusOK, models.ConvUserToUser(user))
+}
+
+func GetAnotherUser(w http.ResponseWriter, r *http.Request, user database.User) {
+	username := chi.URLParam(r, "username")
+	userDb, err := apiCfg.DB.GetUserByUsername(r.Context(), username)
+	if err != nil {
+		responseWithError(w, http.StatusNotFound,
+			fmt.Sprintf("Couldn't get user: %v", err),
+		)
+		return
+	}
+	responseWithJson(w, http.StatusOK, models.ConvUserToUser(userDb))
+}
+
+func UpdateUser(w http.ResponseWriter, r *http.Request, user database.User) {
+	params := models.UpdateUserReq{}
+
+	err := models.VerifyJson(&params, r)
+	if err != nil {
+		responseWithError(w, http.StatusBadRequest,
+			fmt.Sprintf("Error parsing JSON: %v", err),
+		)
+		return
+	}
+
+	err = apiCfg.DB.UpdateUser(r.Context(), database.UpdateUserParams{
+		ID:         user.ID,
+		UpdatedAt:  time.Now().UTC(),
+		Name:       params.Name,
+		PhoneNum:   params.PhoneNum,
+		Email:      params.Email,
+		Username:   params.Username,
+		ProfileImg: params.ProfileImg,
+		Role:       user.Role,
+	})
+
+	if err != nil {
+		responseWithError(w, 400,
+			fmt.Sprintf("couldn't update user: %v", err),
+		)
+		return
+	}
+
+	resp := models.JSONResp{
+		Status:  "success",
+		Message: "User Data Updated",
+		Data:    nil,
+	}
+	responseWithJson(w, http.StatusAccepted, resp)
+}
+
+func UpdateUserPassword(w http.ResponseWriter, r *http.Request, user database.User) {
+	params := models.UpdatePassword{}
+
+	err := models.VerifyJson(&params, r)
+	if err != nil {
+		responseWithError(w, http.StatusBadRequest,
+			fmt.Sprintf("Error parsing JSON: %v", err),
+		)
+		return
+	}
+
+	err = apiCfg.DB.UpdateUserPassword(r.Context(), database.UpdateUserPasswordParams{
+		ID:             user.ID,
+		UpdatedAt:      time.Now().UTC(),
+		HashedPassword: hashPassword(params.Password),
+	})
+
+	if err != nil {
+		responseWithError(w, 400,
+			fmt.Sprintf("couldn't update user password: %v", err),
+		)
+		return
+	}
+
+	resp := models.JSONResp{
+		Status:  "success",
+		Message: "User Password Updated",
+		Data:    nil,
+	}
+	responseWithJson(w, http.StatusAccepted, resp)
+}
+
+func DeleteUser(w http.ResponseWriter, r *http.Request, user database.User) {
+	err := apiCfg.DB.DeleteUser(r.Context(), database.DeleteUserParams{
+		ID:        user.ID,
+		UpdatedAt: time.Now().UTC(),
+	})
+
+	if err != nil {
+		responseWithError(w, 400,
+			fmt.Sprintf("couldn't delete user: %v", err),
+		)
+		return
+	}
+
+	resp := models.JSONResp{
+		Status:  "success",
+		Message: "User Deleted",
+		Data:    nil,
+	}
+	responseWithJson(w, http.StatusAccepted, resp)
+}
+
+func DbDeleteUser(w http.ResponseWriter, r *http.Request, user database.User) {
+	if user.Role < 100 {
+		responseWithError(w, http.StatusUnauthorized,
+			"Proper Authentication Required",
+		)
+		return
+	}
+	err := apiCfg.DB.HardDeleteUser(r.Context(), user.ID)
+
+	if err != nil {
+		responseWithError(w, 400,
+			fmt.Sprintf("couldn't permanently delete user: %v", err),
+		)
+		return
+	}
+
+	resp := models.JSONResp{
+		Status:  "success",
+		Message: "User Deleted Permanently",
+		Data:    nil,
+	}
+	responseWithJson(w, http.StatusAccepted, resp)
 }
 
 func hashPassword(password string) string {

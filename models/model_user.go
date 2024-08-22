@@ -14,6 +14,18 @@ type CreateUserReq struct {
 	Password string `json:"password" validate:"required"`
 }
 
+type UpdateUserReq struct {
+	Username   string `json:"username" validate:"required"`
+	Email      string `json:"email" validate:"required"`
+	Name       string `json:"name" validate:"required"`
+	PhoneNum   string `json:"phone_num" validate:"required"`
+	ProfileImg string `json:"profile_img" validate:"required"`
+}
+
+type UpdatePassword struct {
+	Password string `json:"password" validate:"required"`
+}
+
 type User struct {
 	ID         uuid.UUID `json:"id"`
 	CreatedAt  time.Time `json:"created_at"`
