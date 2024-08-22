@@ -1,4 +1,14 @@
-# Go My Info
+# My Info Backend
+
+Written in `Go` for Reduces Latency.
+
+Things Supported:
+ - CRUD Operation
+ - JWT Based Authentication
+ - JSON Validation
+ - SQLC For modules generation
+ - Goose for Database Migration
+ - Air Integration to Test in Dev ENV
 
 ### Setup
 
@@ -14,5 +24,17 @@ go get github.com/joho/godotenv
 
 ```bash
 cd sql/schema
-goose postgres postgres://<user_id>:<user_password>@localhost:5432/rssAgg up
+goose postgres postgres://<user_id>:<user_password>@localhost:5432/go_my_info up
+```
+
+## Start Application
+
+```bash
+go build ./cmd/main.go && ./main
+```
+
+## Start Dev Environment
+
+```bash
+air
 ```
