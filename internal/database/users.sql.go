@@ -70,8 +70,28 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const deleteUser = `-- name: DeleteUser :exec
+UPDATE users
+SET deleted_at = $2,
+    is_deleted = true,
+    updated_at = $3
+WHERE id = $1
+RETURNING id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password
+`
+
+type DeleteUserParams struct {
+	ID        uuid.UUID
+	DeletedAt sql.NullTime
+	UpdatedAt time.Time
+}
+
+func (q *Queries) DeleteUser(ctx context.Context, arg DeleteUserParams) error {
+	_, err := q.db.ExecContext(ctx, deleteUser, arg.ID, arg.DeletedAt, arg.UpdatedAt)
+	return err
+}
+
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password from users WHERE email=$1
+SELECT id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password from users WHERE email=$1 AND is_deleted = false
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -95,7 +115,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password from users WHERE id=$1
+SELECT id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password from users WHERE id=$1 AND is_deleted = false
 `
 
 func (q *Queries) GetUserById(ctx context.Context, id uuid.UUID) (User, error) {
@@ -119,7 +139,7 @@ func (q *Queries) GetUserById(ctx context.Context, id uuid.UUID) (User, error) {
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password from users WHERE username=$1
+SELECT id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password from users WHERE username=$1 AND is_deleted = false
 `
 
 func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
@@ -140,4 +160,71 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 		&i.HashedPassword,
 	)
 	return i, err
+}
+
+const hardDeleteUser = `-- name: HardDeleteUser :exec
+DELETE FROM users
+WHERE id = $1
+`
+
+func (q *Queries) HardDeleteUser(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, hardDeleteUser, id)
+	return err
+}
+
+const updateUser = `-- name: UpdateUser :exec
+UPDATE users
+SET updated_at = $2,
+    name = $3,
+    phone_num = $4,
+    email = $5,
+    username = $6,
+    profile_img = $7,
+    role = $8
+WHERE id = $1 AND is_deleted=false
+RETURNING id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password
+`
+
+type UpdateUserParams struct {
+	ID         uuid.UUID
+	UpdatedAt  time.Time
+	Name       string
+	PhoneNum   string
+	Email      string
+	Username   string
+	ProfileImg string
+	Role       int32
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
+	_, err := q.db.ExecContext(ctx, updateUser,
+		arg.ID,
+		arg.UpdatedAt,
+		arg.Name,
+		arg.PhoneNum,
+		arg.Email,
+		arg.Username,
+		arg.ProfileImg,
+		arg.Role,
+	)
+	return err
+}
+
+const updateUserPassword = `-- name: UpdateUserPassword :exec
+UPDATE users
+SET hashed_password=$2,
+    updated_at = $3
+WHERE id = $1 AND is_deleted = false
+RETURNING id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password
+`
+
+type UpdateUserPasswordParams struct {
+	ID             uuid.UUID
+	HashedPassword string
+	UpdatedAt      time.Time
+}
+
+func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error {
+	_, err := q.db.ExecContext(ctx, updateUserPassword, arg.ID, arg.HashedPassword, arg.UpdatedAt)
+	return err
 }

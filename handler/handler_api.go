@@ -17,7 +17,6 @@ type apiConfig struct {
 }
 
 var apiCfg apiConfig
-var validate *validator.Validate
 
 func UpdateDB(db *database.Queries) {
 	if db == nil {
@@ -27,7 +26,7 @@ func UpdateDB(db *database.Queries) {
 }
 
 func Init() {
-	validate = validator.New()
+	models.Validate = validator.New()
 
 	apiCfg.AuthToken = jwtauth.New("HS256", []byte(config.Cfg.JWT_SECRET_KEY), nil)
 
