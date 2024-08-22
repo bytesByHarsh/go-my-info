@@ -7,6 +7,13 @@ import (
 	"github.com/google/uuid"
 )
 
+type CreateUserReq struct {
+	Username string `json:"username" validate:"required"`
+	Email    string `json:"email" validate:"required"`
+	Name     string `json:"name" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
 type User struct {
 	ID         uuid.UUID `json:"id"`
 	CreatedAt  time.Time `json:"created_at"`

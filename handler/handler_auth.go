@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -14,22 +13,11 @@ import (
 type authHandler func(http.ResponseWriter, *http.Request, database.User)
 
 func LoginUser(w http.ResponseWriter, r *http.Request) {
-	type parameters struct {
-		Username string `json:"username" validate:"required"`
-		Password string `json:"password" validate:"required"`
-	}
 
-	params := parameters{}
+	params := models.AuthReq{}
+	err := models.VerifyJson(&params, r)
 
-	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
-		responseWithError(w, http.StatusBadRequest,
-			fmt.Sprintf("Error parsing JSON: %v", err),
-		)
-		return
-	}
-
-	// Validate the struct
-	if err := validate.Struct(params); err != nil {
+	if err != nil {
 		responseWithError(w, http.StatusBadRequest,
 			fmt.Sprintf("Error parsing JSON: %v", err),
 		)
