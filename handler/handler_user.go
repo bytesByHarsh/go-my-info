@@ -15,6 +15,11 @@ import (
 	"github.com/google/uuid"
 )
 
+const (
+	UserRole_Admin = 100
+	UserRole_Base  = 10
+)
+
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	params := models.CreateUserReq{}
@@ -75,6 +80,53 @@ func GetAnotherUser(w http.ResponseWriter, r *http.Request, user database.User) 
 	responseWithJson(w, http.StatusOK, models.ConvUserToUser(userDb))
 }
 
+func GetUserList(w http.ResponseWriter, r *http.Request, user database.User) {
+	if user.Role != UserRole_Admin {
+		responseWithError(w, http.StatusUnauthorized,
+			"Access Denied",
+		)
+		return
+	}
+
+	params := models.GetUserListReq{}
+	err := models.VerifyJson(&params, r)
+	if err != nil {
+		responseWithError(w, http.StatusBadRequest,
+			fmt.Sprintf("Error parsing JSON: %v", err),
+		)
+		return
+	}
+
+	dbUserList, err := apiCfg.DB.GetAllUsers(r.Context(), database.GetAllUsersParams{
+		Limit:  int32(params.ItemsPerPage),
+		Offset: int32((params.Page - 1) * params.ItemsPerPage),
+	})
+
+	if err != nil {
+		responseWithError(w, http.StatusBadRequest,
+			fmt.Sprintf("couldn't get user list: %v", err),
+		)
+		return
+	}
+
+	total_count, err := apiCfg.DB.GetUserCount(r.Context())
+	if err != nil {
+		responseWithError(w, http.StatusBadRequest,
+			fmt.Sprintf("couldn't get user list: %v", err),
+		)
+		return
+	}
+
+	resp := models.PaginatedListResp[models.User]{
+		Data:         models.CreateUserListResp(dbUserList),
+		Page:         params.Page,
+		ItemsPerPage: params.ItemsPerPage,
+		TotalCount:   int(total_count),
+	}
+	resp.UpdateHasMore()
+	responseWithJson(w, http.StatusOK, resp)
+}
+
 func UpdateUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	params := models.UpdateUserReq{}
 
@@ -113,7 +165,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request, user database.User) {
 }
 
 func UpdateUserPassword(w http.ResponseWriter, r *http.Request, user database.User) {
-	params := models.UpdatePassword{}
+	params := models.UpdatePasswordReq{}
 
 	err := models.VerifyJson(&params, r)
 	if err != nil {
@@ -166,7 +218,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request, user database.User) {
 }
 
 func DbDeleteUser(w http.ResponseWriter, r *http.Request, user database.User) {
-	if user.Role < 100 {
+	if user.Role < UserRole_Admin {
 		responseWithError(w, http.StatusUnauthorized,
 			"Proper Authentication Required",
 		)

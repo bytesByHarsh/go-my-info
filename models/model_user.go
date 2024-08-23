@@ -22,8 +22,13 @@ type UpdateUserReq struct {
 	ProfileImg string `json:"profile_img" validate:"required"`
 }
 
-type UpdatePassword struct {
+type UpdatePasswordReq struct {
 	Password string `json:"password" validate:"required"`
+}
+
+type GetUserListReq struct {
+	Page         int `json:"page"`
+	ItemsPerPage int `json:"items_per_page"`
 }
 
 type User struct {
@@ -52,6 +57,14 @@ func ConvUserToUser(dbUser database.User) User {
 		ProfileImg:  dbUser.ProfileImg,
 		Role:        dbUser.Role,
 		IsSuperUser: dbUser.Role == 100,
-		IsActive:    true,
+		IsActive:    dbUser.IsActive,
 	}
+}
+
+func CreateUserListResp(dbUserList []database.User) []User {
+	userList := []User{}
+	for _, dbUser := range dbUserList {
+		userList = append(userList, ConvUserToUser(dbUser))
+	}
+	return userList
 }

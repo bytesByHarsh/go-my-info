@@ -28,3 +28,25 @@ func VerifyJson(data interface{}, r *http.Request) error {
 
 	return nil
 }
+
+type PaginatedListResp[T any] struct {
+	Data         []T  `json:"data"`
+	TotalCount   int  `json:"total_count"`
+	HasMore      bool `json:"has_more"`
+	Page         int  `json:"page"`
+	ItemsPerPage int  `json:"items_per_page"`
+}
+
+// func GetPaginatedResp[T any](Data T, total_count, page, items_per_page int) PaginatedListResp[T] {
+// 	return PaginatedListResp[T]{
+// 		Data:         []T{Data},
+// 		Page:         page,
+// 		ItemsPerPage: items_per_page,
+// 		TotalCount:   total_count,
+// 		HasMore:      (page * items_per_page) < total_count,
+// 	}
+// }
+
+func (l PaginatedListResp[T]) UpdateHasMore() {
+	l.HasMore = (l.Page * l.ItemsPerPage) < l.TotalCount
+}

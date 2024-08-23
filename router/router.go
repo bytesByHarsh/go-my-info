@@ -23,6 +23,7 @@ func SetupRoutes(app *chi.Mux) {
 
 	userRouter.Get("/{username}", handler.MiddlewareAuth(handler.GetAnotherUser))
 	userRouter.Delete("/{username}", handler.MiddlewareAuth(handler.DbDeleteUser))
+	userRouter.Get("/list", handler.MiddlewareAuth(handler.GetUserList))
 
 	v1Router.Mount("/user", userRouter)
 	app.Mount("/v1", v1Router)
