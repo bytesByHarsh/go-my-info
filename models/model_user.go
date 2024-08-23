@@ -27,27 +27,31 @@ type UpdatePassword struct {
 }
 
 type User struct {
-	ID         uuid.UUID `json:"id"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
-	Name       string    `json:"name"`
-	PhoneNum   string    `json:"phone_number"`
-	Email      string    `json:"email"`
-	Username   string    `json:"username"`
-	ProfileImg string    `json:"profile_img"`
-	Role       int32     `json:"role"`
+	ID          uuid.UUID `json:"id"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	Name        string    `json:"name"`
+	PhoneNum    string    `json:"phone_number"`
+	Email       string    `json:"email"`
+	Username    string    `json:"username"`
+	ProfileImg  string    `json:"profile_img"`
+	Role        int32     `json:"role"`
+	IsSuperUser bool      `json:"is_superuser"`
+	IsActive    bool      `json:"is_active"`
 }
 
 func ConvUserToUser(dbUser database.User) User {
 	return User{
-		ID:         dbUser.ID,
-		CreatedAt:  dbUser.CreatedAt,
-		UpdatedAt:  dbUser.UpdatedAt,
-		Name:       dbUser.Name,
-		PhoneNum:   dbUser.PhoneNum,
-		Email:      dbUser.Email,
-		Username:   dbUser.Username,
-		ProfileImg: dbUser.ProfileImg,
-		Role:       dbUser.Role,
+		ID:          dbUser.ID,
+		CreatedAt:   dbUser.CreatedAt,
+		UpdatedAt:   dbUser.UpdatedAt,
+		Name:        dbUser.Name,
+		PhoneNum:    dbUser.PhoneNum,
+		Email:       dbUser.Email,
+		Username:    dbUser.Username,
+		ProfileImg:  dbUser.ProfileImg,
+		Role:        dbUser.Role,
+		IsSuperUser: dbUser.Role == 100,
+		IsActive:    true,
 	}
 }
