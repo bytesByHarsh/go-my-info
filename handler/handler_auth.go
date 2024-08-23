@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/bytesByHarsh/go-my-info/internal/database"
@@ -56,39 +58,66 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := models.JSONResp{
-		Status:  "success",
-		Message: "User Logged In",
-		Data:    models.AuthResp{Token: tokenString},
-	}
+	// resp := models.JSONResp{
+	// 	Status:  "success",
+	// 	Message: "User Logged In",
+	// 	Data:    models.AuthResp{Token: tokenString},
+	// }
 	cookie := http.Cookie{
-		Name:     "auth_token",
-		Value:    tokenString,
-		MaxAge:   8 * 60 * 60,
+		Name:  "access_token",
+		Value: tokenString,
+		// MaxAge:   8 * 60 * 60,
 		Secure:   false,
 		SameSite: http.SameSiteLaxMode,
-		// Path:     "/",
-		// HttpOnly: true,
+		Path:     "/",
+		HttpOnly: true,
 	}
 	http.SetCookie(w, &cookie)
-	responseWithJson(w, 201, resp)
+	responseWithJson(w, 201, models.AuthResp{Token: tokenString})
 
+}
+
+func getTokenFromHeader(headers http.Header) (string, error) {
+	value := headers.Get("Authorization")
+	if value == "" {
+		return "", errors.New("no authentication Info Found")
+	}
+
+	values := strings.Split(value, " ")
+	if len(values) != 2 {
+		return "", errors.New("malformed auth header")
+	}
+
+	if values[0] != "Bearer" {
+		return "", errors.New("malformed first part of auth header")
+	}
+
+	return values[1], nil
 }
 
 func MiddlewareAuth(handler authHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Get the JWT token from the cookie
-		c, err := r.Cookie("auth_token")
+		var tokenInCookie bool = false
+		var tokenStr string = ""
+		c, err := r.Cookie("access_token")
 		if err != nil {
-			if err == http.ErrNoCookie {
+			if err != http.ErrNoCookie {
+				responseWithError(w, http.StatusBadRequest, "Bad request")
+				return
+			}
+		} else {
+			tokenInCookie = true
+			tokenStr = c.Value
+		}
+
+		if !tokenInCookie {
+			tokenStr, err = getTokenFromHeader(r.Header)
+			if err != nil {
 				responseWithError(w, http.StatusUnauthorized, "User Not Authenticated")
 				return
 			}
-			responseWithError(w, http.StatusBadRequest, "Bad request")
-			return
 		}
-
-		tokenStr := c.Value
 
 		token, err := apiCfg.AuthToken.Decode(tokenStr)
 		if err != nil {
