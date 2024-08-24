@@ -66,7 +66,7 @@ func parsePaginatedReq(r *http.Request) (int, int, error) {
 	if err != nil {
 		return 0, 0, err
 	}
-	items_per_page, err := strconv.Atoi(pageStr)
+	items_per_page, err := strconv.Atoi(items_per_pageStr)
 	if err != nil {
 		return 0, 0, err
 	}
