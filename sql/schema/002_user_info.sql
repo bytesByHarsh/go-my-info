@@ -28,10 +28,14 @@ CREATE TABLE bank_accounts (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMPTZ DEFAULT NULL,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     bank_id UUID NOT NULL REFERENCES banks(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name VARCHAR(100) NOT NULL,
     account_number VARCHAR(50) UNIQUE NOT NULL,
-    account_type bank_account_type NOT NULL
+    account_type bank_account_type NOT NULL,
+    balance NUMERIC(20, 2) NOT NULL,
+    currency VARCHAR(3) NOT NULL
 );
 
 CREATE TYPE card_type AS ENUM('credit', 'debit');
@@ -41,6 +45,7 @@ CREATE TABLE cards (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMPTZ DEFAULT NULL,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     bank_id UUID NOT NULL REFERENCES banks(id) ON DELETE CASCADE,
     bank_account_id UUID REFERENCES bank_accounts(id) ON DELETE CASCADE,
@@ -49,7 +54,9 @@ CREATE TABLE cards (
     number VARCHAR(19) UNIQUE NOT NULL,
     type card_type NOT NULL,
     expiration_date DATE NOT NULL,
-    cvv VARCHAR(4) NOT NULL
+    cvv VARCHAR(4) NOT NULL,
+    total_limit NUMERIC(20, 2) NOT NULL,
+    bill_date DATE NOT NULL
 );
 
 -- +goose Down

@@ -165,10 +165,14 @@ type BankAccount struct {
 	UpdatedAt     time.Time
 	DeletedAt     sql.NullTime
 	IsDeleted     bool
+	IsActive      bool
 	BankID        uuid.UUID
 	UserID        uuid.UUID
+	Name          string
 	AccountNumber string
 	AccountType   BankAccountType
+	Balance       string
+	Currency      string
 }
 
 type Card struct {
@@ -177,6 +181,7 @@ type Card struct {
 	UpdatedAt      time.Time
 	DeletedAt      sql.NullTime
 	IsDeleted      bool
+	IsActive       bool
 	UserID         uuid.UUID
 	BankID         uuid.UUID
 	BankAccountID  uuid.NullUUID
@@ -186,6 +191,8 @@ type Card struct {
 	Type           CardType
 	ExpirationDate time.Time
 	Cvv            string
+	TotalLimit     string
+	BillDate       time.Time
 }
 
 type User struct {
