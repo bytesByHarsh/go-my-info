@@ -32,7 +32,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hash := hashPassword(params.Password)
+	hash := HashPassword(params.Password)
 
 	dbUser, err := apiCfg.DB.CreateUser(r.Context(), database.CreateUserParams{
 		ID:             uuid.New(),
@@ -177,7 +177,7 @@ func UpdateUserPassword(w http.ResponseWriter, r *http.Request, user database.Us
 	err = apiCfg.DB.UpdateUserPassword(r.Context(), database.UpdateUserPasswordParams{
 		ID:             user.ID,
 		UpdatedAt:      time.Now().UTC(),
-		HashedPassword: hashPassword(params.Password),
+		HashedPassword: HashPassword(params.Password),
 	})
 
 	if err != nil {
@@ -240,7 +240,7 @@ func DbDeleteUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	responseWithJson(w, http.StatusAccepted, resp)
 }
 
-func hashPassword(password string) string {
+func HashPassword(password string) string {
 	// bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	// return string(bytes), err
 	// Concatenate the secret and password

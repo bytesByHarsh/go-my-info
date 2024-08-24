@@ -152,5 +152,5 @@ func MiddlewareAuth(handler authHandler) http.HandlerFunc {
 }
 
 func checkPassword(hashPass, inputPass string) bool {
-	return hashPassword(inputPass) == hashPass
+	return HashPassword(inputPass) == hashPass
 }
