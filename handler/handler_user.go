@@ -88,18 +88,17 @@ func GetUserList(w http.ResponseWriter, r *http.Request, user database.User) {
 		return
 	}
 
-	params := models.GetUserListReq{}
-	err := models.VerifyJson(&params, r)
+	page, items_per_page, err := parsePaginatedReq(r)
 	if err != nil {
 		responseWithError(w, http.StatusBadRequest,
-			fmt.Sprintf("Error parsing JSON: %v", err),
+			fmt.Sprintf("incorrect data: %v", err),
 		)
 		return
 	}
 
 	dbUserList, err := apiCfg.DB.GetAllUsers(r.Context(), database.GetAllUsersParams{
-		Limit:  int32(params.ItemsPerPage),
-		Offset: int32((params.Page - 1) * params.ItemsPerPage),
+		Limit:  int32(items_per_page),
+		Offset: int32((page - 1) * items_per_page),
 	})
 
 	if err != nil {
@@ -119,8 +118,8 @@ func GetUserList(w http.ResponseWriter, r *http.Request, user database.User) {
 
 	resp := models.PaginatedListResp[models.User]{
 		Data:         models.CreateUserListResp(dbUserList),
-		Page:         params.Page,
-		ItemsPerPage: params.ItemsPerPage,
+		Page:         page,
+		ItemsPerPage: items_per_page,
 		TotalCount:   int(total_count),
 	}
 	resp.UpdateHasMore()

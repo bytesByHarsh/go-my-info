@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"errors"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/bytesByHarsh/go-my-info/config"
 	"github.com/bytesByHarsh/go-my-info/internal/database"
@@ -51,4 +53,22 @@ func Hello(w http.ResponseWriter, r *http.Request) {
 		Data:    nil,
 	}
 	responseWithJson(w, 201, resp)
+}
+
+func parsePaginatedReq(r *http.Request) (int, int, error) {
+	pageStr := r.URL.Query().Get("page")
+	items_per_pageStr := r.URL.Query().Get("items_per_page")
+	if pageStr == "" || items_per_pageStr == "" {
+		return 0, 0, errors.New("wrong query give")
+	}
+
+	page, err := strconv.Atoi(pageStr)
+	if err != nil {
+		return 0, 0, err
+	}
+	items_per_page, err := strconv.Atoi(pageStr)
+	if err != nil {
+		return 0, 0, err
+	}
+	return page, items_per_page, err
 }

@@ -6,6 +6,7 @@ Things Supported:
  - CRUD Operation
  - JWT Based Authentication
  - JSON Validation
+ - Paginated Response
  - SQLC For modules generation
  - Goose for Database Migration
  - Air Integration to Test in Dev ENV
