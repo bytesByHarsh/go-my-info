@@ -25,6 +25,7 @@ func SetupRoutes(app *chi.Mux) {
 	userRouter.Get("/{username}", handler.MiddlewareAuth(handler.GetAnotherUser))
 	userRouter.Delete("/{username}", handler.MiddlewareAuth(handler.DbDeleteUser))
 	userRouter.Get("/list", handler.MiddlewareAuth(handler.GetUserList))
+	userRouter.Put("/{user_id}", handler.MiddlewareAuth(handler.UpdateAnotherUser))
 
 	// Bank
 	bankRouter := chi.NewRouter()

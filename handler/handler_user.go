@@ -220,6 +220,57 @@ func UpdateUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	}
 	responseWithJson(w, http.StatusAccepted, resp)
 }
+func UpdateAnotherUser(w http.ResponseWriter, r *http.Request, user database.User) {
+	if user.Role != UserRole_Admin {
+		responseWithError(w, http.StatusUnauthorized,
+			"Access Denied",
+		)
+		return
+	}
+	userId := chi.URLParam(r, "user_id")
+	id, err := uuid.Parse(userId)
+	if err != nil {
+		responseWithError(w, http.StatusBadRequest,
+			"Incorrect User Id provided",
+		)
+		return
+	}
+
+	params := models.UpdateUserReq{}
+
+	err = models.VerifyJson(&params, r)
+	if err != nil {
+		responseWithError(w, http.StatusBadRequest,
+			fmt.Sprintf("Error parsing JSON: %v", err),
+		)
+		return
+	}
+
+	err = apiCfg.DB.UpdateUser(r.Context(), database.UpdateUserParams{
+		ID:         id,
+		UpdatedAt:  time.Now().UTC(),
+		Name:       params.Name,
+		PhoneNum:   params.PhoneNum,
+		Email:      params.Email,
+		Username:   params.Username,
+		ProfileImg: params.ProfileImg,
+		Role:       user.Role,
+	})
+
+	if err != nil {
+		responseWithError(w, 400,
+			fmt.Sprintf("couldn't update user: %v", err),
+		)
+		return
+	}
+
+	resp := models.JSONResp{
+		Status:  "success",
+		Message: "User Data Updated",
+		Data:    nil,
+	}
+	responseWithJson(w, http.StatusAccepted, resp)
+}
 
 func UpdateUserPassword(w http.ResponseWriter, r *http.Request, user database.User) {
 	params := models.UpdatePasswordReq{}
