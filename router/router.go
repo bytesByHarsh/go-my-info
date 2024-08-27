@@ -21,6 +21,7 @@ func SetupRoutes(app *chi.Mux) {
 	userRouter.Delete("/me", handler.MiddlewareAuth(handler.DeleteUser))
 	userRouter.Put("/me/password", handler.MiddlewareAuth(handler.UpdateUserPassword))
 
+	userRouter.Post("/add", handler.MiddlewareAuth(handler.CreateUserByAdmin))
 	userRouter.Get("/{username}", handler.MiddlewareAuth(handler.GetAnotherUser))
 	userRouter.Delete("/{username}", handler.MiddlewareAuth(handler.DbDeleteUser))
 	userRouter.Get("/list", handler.MiddlewareAuth(handler.GetUserList))
@@ -29,6 +30,7 @@ func SetupRoutes(app *chi.Mux) {
 	bankRouter := chi.NewRouter()
 	bankRouter.Post("/register", handler.MiddlewareAuth(handler.CreateBank))
 	bankRouter.Get("/list", handler.GetBankList)
+	bankRouter.Put("/{bank_id}", handler.MiddlewareAuth(handler.UpdateBank))
 
 	v1Router.Mount("/users", userRouter)
 	v1Router.Mount("/banks", bankRouter)

@@ -14,6 +14,15 @@ type CreateUserReq struct {
 	Password string `json:"password" validate:"required"`
 }
 
+type CreateUserByAdminReq struct {
+	Username    string `json:"username" validate:"required"`
+	Email       string `json:"email" validate:"required"`
+	Name        string `json:"name" validate:"required"`
+	Password    string `json:"password" validate:"required"`
+	IsSuperUser bool   `json:"is_superuser"`
+	IsActive    bool   `json:"is_active" validate:"required"`
+}
+
 type UpdateUserReq struct {
 	Username   string `json:"username" validate:"required"`
 	Email      string `json:"email" validate:"required"`

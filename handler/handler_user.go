@@ -64,6 +64,64 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	responseWithJson(w, 201, resp)
 }
 
+func CreateUserByAdmin(w http.ResponseWriter, r *http.Request, user database.User) {
+	if user.Role != UserRole_Admin {
+		responseWithError(w, http.StatusUnauthorized,
+			"Access Denied",
+		)
+		return
+	}
+
+	params := models.CreateUserByAdminReq{}
+
+	err := models.VerifyJson(&params, r)
+	if err != nil {
+		responseWithError(w, http.StatusBadRequest,
+			fmt.Sprintf("Error parsing JSON: %v", err),
+		)
+		return
+	}
+
+	hash := HashPassword(params.Password)
+
+	var role int32
+	if params.IsSuperUser {
+		role = 100
+	} else {
+		role = 10
+	}
+
+	dbUser, err := apiCfg.DB.CreateUser(r.Context(), database.CreateUserParams{
+		ID:             uuid.New(),
+		CreatedAt:      time.Now().UTC(),
+		UpdatedAt:      time.Now().UTC(),
+		DeletedAt:      sql.NullTime{},
+		IsDeleted:      false,
+		Name:           params.Name,
+		Email:          params.Email,
+		Username:       params.Username,
+		PhoneNum:       "",
+		ProfileImg:     "",
+		Role:           role,
+		HashedPassword: hash,
+	})
+
+	if err != nil {
+		responseWithError(w, 400,
+			fmt.Sprintf("couldn't create user: %v", err),
+		)
+		return
+	}
+
+	resp := models.JSONResp{
+		Status:  "success",
+		Message: "User Created",
+		Data:    models.ConvUserToUser(dbUser),
+	}
+	responseWithJson(w, 201, resp)
+
+}
+
 func GetUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	responseWithJson(w, http.StatusOK, models.ConvUserToUser(user))
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/bytesByHarsh/go-my-info/internal/database"
 	"github.com/bytesByHarsh/go-my-info/models"
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
 
@@ -103,4 +104,66 @@ func GetBankList(w http.ResponseWriter, r *http.Request) {
 	}
 	resp.UpdateHasMore()
 	responseWithJson(w, http.StatusOK, resp)
+}
+
+func UpdateBank(w http.ResponseWriter, r *http.Request, user database.User) {
+	if user.Role != UserRole_Admin {
+		responseWithError(w, http.StatusUnauthorized,
+			"Access Denied",
+		)
+		return
+	}
+	bankId := chi.URLParam(r, "bank_id")
+	id, err := uuid.Parse(bankId)
+	if err != nil {
+		responseWithError(w, http.StatusBadRequest,
+			"Incorrect Bank Id provided",
+		)
+		return
+	}
+	params := models.UpdateBankReq{}
+
+	err = models.VerifyJson(&params, r)
+	if err != nil {
+		responseWithError(w, http.StatusBadRequest,
+			fmt.Sprintf("Error parsing JSON: %v", err),
+		)
+		return
+	}
+
+	contactPhone := sql.NullString{}
+	if params.ContactPhone != "" {
+		contactPhone.Valid = true
+		contactPhone.String = params.ContactPhone
+	}
+
+	address := sql.NullString{}
+	if params.Address != "" {
+		address.Valid = true
+		address.String = params.Address
+	}
+
+	err = apiCfg.DB.UpdateBank(r.Context(), database.UpdateBankParams{
+		ID:           id,
+		UpdatedAt:    time.Now().UTC(),
+		Name:         params.Name,
+		ContactPhone: contactPhone,
+		ContactEmail: params.ContactEmail,
+		Address:      address,
+		Type:         params.BankType,
+	})
+
+	if err != nil {
+		responseWithError(w, 400,
+			fmt.Sprintf("couldn't update bank: %v", err),
+		)
+		return
+	}
+
+	resp := models.JSONResp{
+		Status:  "success",
+		Message: "Bank Data Updated",
+		Data:    nil,
+	}
+	responseWithJson(w, http.StatusAccepted, resp)
 }
