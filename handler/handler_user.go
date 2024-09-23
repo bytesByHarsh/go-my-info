@@ -20,6 +20,17 @@ const (
 	UserRole_Base  = 10
 )
 
+// CreateUser godoc
+//
+//	@Summary		Create User
+//	@Description	create new user
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		models.CreateUserReq	true	"User Body"
+//	@Success		201		{object}	models.User
+//	@Failure		400		{object}	models.JSONerrResponse
+//	@Router			/users/register [post]
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	params := models.CreateUserReq{}

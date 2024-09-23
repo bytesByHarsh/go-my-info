@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/bytesByHarsh/go-my-info/models"
 )
 
 func responseWithJson(w http.ResponseWriter, code int, payload interface{}) {
@@ -23,11 +25,7 @@ func responseWithError(w http.ResponseWriter, code int, msg string) {
 		log.Printf("Responding with 5XX error: %v", msg)
 	}
 
-	type errResponse struct {
-		Error string `json:"error"`
-	}
-
-	responseWithJson(w, code, errResponse{
+	responseWithJson(w, code, models.JSONerrResponse{
 		Error: msg,
 	})
 }

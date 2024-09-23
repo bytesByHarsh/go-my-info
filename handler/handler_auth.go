@@ -14,6 +14,17 @@ import (
 
 type authHandler func(http.ResponseWriter, *http.Request, database.User)
 
+// LoginUser godoc
+//
+//	@Summary		Login User
+//	@Description	get login token
+//	@Tags			Authentication
+//	@Accept			json
+//	@Produce		json
+//	@Param			login	body		models.AuthReq	true	"Login Body"
+//	@Success		201		{object}	models.AuthResp
+//	@Failure		400		{object}	models.JSONerrResponse
+//	@Router			/users/login [post]
 func LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	params := models.AuthReq{}
