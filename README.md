@@ -28,6 +28,12 @@ cd sql/schema
 goose postgres postgres://<user_id>:<user_password>@localhost:5432/go_my_info up
 ```
 
+## Generate Internal DB
+
+```bash
+sqlc generate
+```
+
 ## Start Application
 
 ```bash

@@ -63,7 +63,7 @@ func CreateBank(w http.ResponseWriter, r *http.Request, user database.User) {
 
 	resp := models.JSONResp{
 		Status:  "success",
-		Message: "User Created",
+		Message: "Bank Created",
 		Data:    models.ConvBankToBank(dbBank),
 	}
 	responseWithJson(w, 201, resp)
@@ -85,14 +85,14 @@ func GetBankList(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		responseWithError(w, http.StatusBadRequest,
-			fmt.Sprintf("couldn't get user list: %v", err),
+			fmt.Sprintf("couldn't get bank list: %v", err),
 		)
 		return
 	}
 	total_count, err := apiCfg.DB.GetBankCount(r.Context())
 	if err != nil {
 		responseWithError(w, http.StatusBadRequest,
-			fmt.Sprintf("couldn't get user list: %v", err),
+			fmt.Sprintf("couldn't get bank list: %v", err),
 		)
 		return
 	}
