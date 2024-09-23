@@ -17,9 +17,9 @@ const createUser = `-- name: CreateUser :one
 INSERT INTO users(id, created_at, updated_at,
                   deleted_at, is_deleted,
                   name, phone_num, email, username,
-                  profile_img, role, hashed_password)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-RETURNING id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password
+                  profile_img, role, hashed_password, is_active)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, TRUE)
+RETURNING id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password, is_active
 `
 
 type CreateUserParams struct {
@@ -66,6 +66,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.ProfileImg,
 		&i.Role,
 		&i.HashedPassword,
+		&i.IsActive,
 	)
 	return i, err
 }
@@ -76,7 +77,7 @@ SET deleted_at = $2,
     is_deleted = true,
     updated_at = $3
 WHERE id = $1
-RETURNING id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password
+RETURNING id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password, is_active
 `
 
 type DeleteUserParams struct {
@@ -90,8 +91,60 @@ func (q *Queries) DeleteUser(ctx context.Context, arg DeleteUserParams) error {
 	return err
 }
 
+const getAllUsers = `-- name: GetAllUsers :many
+SELECT id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password, is_active
+FROM
+    users
+WHERE is_deleted = false
+ORDER BY
+    name ASC
+LIMIT $1 OFFSET $2
+`
+
+type GetAllUsersParams struct {
+	Limit  int32
+	Offset int32
+}
+
+func (q *Queries) GetAllUsers(ctx context.Context, arg GetAllUsersParams) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, getAllUsers, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.IsDeleted,
+			&i.Name,
+			&i.PhoneNum,
+			&i.Email,
+			&i.Username,
+			&i.ProfileImg,
+			&i.Role,
+			&i.HashedPassword,
+			&i.IsActive,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password from users WHERE email=$1 AND is_deleted = false
+SELECT id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password, is_active from users WHERE email=$1 AND is_deleted = false
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -110,12 +163,13 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.ProfileImg,
 		&i.Role,
 		&i.HashedPassword,
+		&i.IsActive,
 	)
 	return i, err
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password from users WHERE id=$1 AND is_deleted = false
+SELECT id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password, is_active from users WHERE id=$1 AND is_deleted = false
 `
 
 func (q *Queries) GetUserById(ctx context.Context, id uuid.UUID) (User, error) {
@@ -134,12 +188,13 @@ func (q *Queries) GetUserById(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.ProfileImg,
 		&i.Role,
 		&i.HashedPassword,
+		&i.IsActive,
 	)
 	return i, err
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password from users WHERE username=$1 AND is_deleted = false
+SELECT id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password, is_active from users WHERE username=$1 AND is_deleted = false
 `
 
 func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
@@ -158,8 +213,20 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User,
 		&i.ProfileImg,
 		&i.Role,
 		&i.HashedPassword,
+		&i.IsActive,
 	)
 	return i, err
+}
+
+const getUserCount = `-- name: GetUserCount :one
+SELECT COUNT(*) FROM users WHERE is_deleted=false
+`
+
+func (q *Queries) GetUserCount(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getUserCount)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
 }
 
 const hardDeleteUser = `-- name: HardDeleteUser :exec
@@ -182,7 +249,7 @@ SET updated_at = $2,
     profile_img = $7,
     role = $8
 WHERE id = $1 AND is_deleted=false
-RETURNING id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password
+RETURNING id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password, is_active
 `
 
 type UpdateUserParams struct {
@@ -215,7 +282,7 @@ UPDATE users
 SET hashed_password=$2,
     updated_at = $3
 WHERE id = $1 AND is_deleted = false
-RETURNING id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password
+RETURNING id, created_at, updated_at, deleted_at, is_deleted, name, phone_num, email, username, profile_img, role, hashed_password, is_active
 `
 
 type UpdateUserPasswordParams struct {

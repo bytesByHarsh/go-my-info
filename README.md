@@ -6,6 +6,7 @@ Things Supported:
  - CRUD Operation
  - JWT Based Authentication
  - JSON Validation
+ - Paginated Response
  - SQLC For modules generation
  - Goose for Database Migration
  - Air Integration to Test in Dev ENV
@@ -25,6 +26,12 @@ go get github.com/joho/godotenv
 ```bash
 cd sql/schema
 goose postgres postgres://<user_id>:<user_password>@localhost:5432/go_my_info up
+```
+
+## Generate Internal DB
+
+```bash
+sqlc generate
 ```
 
 ## Start Application
