@@ -45,3 +45,9 @@ go build ./cmd/main.go && ./main
 ```bash
 air
 ```
+
+## Generate Swagger Documentation
+
+```bash
+swag init -o './api' -g './cmd/main.go'
+```

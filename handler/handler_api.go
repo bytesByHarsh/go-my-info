@@ -45,7 +45,13 @@ func Init() {
 	// log.Printf("Dummy Token: %v", tokenString)
 }
 
-// Hello handle api status
+// Hello godoc
+// @Summary      Hello API
+// @Description  get string by ID
+// @Tags         Ping
+// @Produce      json
+// @Success      200  {object}  models.JSONResp
+// @Router       / [get]
 func Hello(w http.ResponseWriter, r *http.Request) {
 	resp := models.JSONResp{
 		Status:  "success",
