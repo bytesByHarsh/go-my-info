@@ -53,10 +53,11 @@ CREATE TABLE cards (
     nickname VARCHAR(100) NOT NULL,
     number VARCHAR(19) UNIQUE NOT NULL,
     type card_type NOT NULL,
-    expiration_date DATE NOT NULL,
-    cvv VARCHAR(4) NOT NULL,
+    exp_month INTEGER NOT NULL CHECK (exp_month >= 1 AND exp_month <= 12),
+    exp_year INTEGER NOT NULL CHECK (exp_year >= 24 AND exp_year <= 50),
+    cvv NUMERIC(3,2) NOT NULL,
     total_limit NUMERIC(20, 2) NOT NULL,
-    bill_date DATE NOT NULL
+    bill_date INTEGER NOT NULL CHECK (bill_date >= 1 AND bill_date <= 31)
 );
 
 -- +goose Down

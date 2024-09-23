@@ -17,31 +17,32 @@ const createCard = `-- name: CreateCard :one
 INSERT INTO cards(
     id, created_at, updated_at, deleted_at, is_deleted,is_active,
     bank_id, user_id, bank_account_id, name, nickname,
-    number, type, expiration_date, cvv, total_limit, bill_date)
+    number, type, exp_month, exp_year, cvv, total_limit, bill_date)
 VALUES ($1, $2, $3, $4, $5, $6, $7,
         $8, $9, $10, $11, $12, $13,
-        $14, $15, $16, $17)
-RETURNING id, created_at, updated_at, deleted_at, is_deleted, is_active, user_id, bank_id, bank_account_id, name, nickname, number, type, expiration_date, cvv, total_limit, bill_date
+        $14, $15, $16, $17, $18)
+RETURNING id, created_at, updated_at, deleted_at, is_deleted, is_active, user_id, bank_id, bank_account_id, name, nickname, number, type, exp_month, exp_year, cvv, total_limit, bill_date
 `
 
 type CreateCardParams struct {
-	ID             uuid.UUID
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	DeletedAt      sql.NullTime
-	IsDeleted      bool
-	IsActive       bool
-	BankID         uuid.UUID
-	UserID         uuid.UUID
-	BankAccountID  uuid.NullUUID
-	Name           string
-	Nickname       string
-	Number         string
-	Type           CardType
-	ExpirationDate time.Time
-	Cvv            string
-	TotalLimit     string
-	BillDate       time.Time
+	ID            uuid.UUID
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	DeletedAt     sql.NullTime
+	IsDeleted     bool
+	IsActive      bool
+	BankID        uuid.UUID
+	UserID        uuid.UUID
+	BankAccountID uuid.NullUUID
+	Name          string
+	Nickname      string
+	Number        string
+	Type          CardType
+	ExpMonth      int32
+	ExpYear       int32
+	Cvv           string
+	TotalLimit    string
+	BillDate      int32
 }
 
 func (q *Queries) CreateCard(ctx context.Context, arg CreateCardParams) (Card, error) {
@@ -59,7 +60,8 @@ func (q *Queries) CreateCard(ctx context.Context, arg CreateCardParams) (Card, e
 		arg.Nickname,
 		arg.Number,
 		arg.Type,
-		arg.ExpirationDate,
+		arg.ExpMonth,
+		arg.ExpYear,
 		arg.Cvv,
 		arg.TotalLimit,
 		arg.BillDate,
@@ -79,7 +81,8 @@ func (q *Queries) CreateCard(ctx context.Context, arg CreateCardParams) (Card, e
 		&i.Nickname,
 		&i.Number,
 		&i.Type,
-		&i.ExpirationDate,
+		&i.ExpMonth,
+		&i.ExpYear,
 		&i.Cvv,
 		&i.TotalLimit,
 		&i.BillDate,
@@ -93,7 +96,7 @@ SET deleted_at = $2,
     is_deleted = true,
     updated_at = $3
 WHERE id = $1
-RETURNING id, created_at, updated_at, deleted_at, is_deleted, is_active, user_id, bank_id, bank_account_id, name, nickname, number, type, expiration_date, cvv, total_limit, bill_date
+RETURNING id, created_at, updated_at, deleted_at, is_deleted, is_active, user_id, bank_id, bank_account_id, name, nickname, number, type, exp_month, exp_year, cvv, total_limit, bill_date
 `
 
 type DeleteCardParams struct {
@@ -108,7 +111,7 @@ func (q *Queries) DeleteCard(ctx context.Context, arg DeleteCardParams) error {
 }
 
 const getAllCard = `-- name: GetAllCard :many
-SELECT id, created_at, updated_at, deleted_at, is_deleted, is_active, user_id, bank_id, bank_account_id, name, nickname, number, type, expiration_date, cvv, total_limit, bill_date
+SELECT id, created_at, updated_at, deleted_at, is_deleted, is_active, user_id, bank_id, bank_account_id, name, nickname, number, type, exp_month, exp_year, cvv, total_limit, bill_date
 FROM
     cards
 WHERE is_deleted = false
@@ -145,7 +148,8 @@ func (q *Queries) GetAllCard(ctx context.Context, arg GetAllCardParams) ([]Card,
 			&i.Nickname,
 			&i.Number,
 			&i.Type,
-			&i.ExpirationDate,
+			&i.ExpMonth,
+			&i.ExpYear,
 			&i.Cvv,
 			&i.TotalLimit,
 			&i.BillDate,
@@ -164,7 +168,7 @@ func (q *Queries) GetAllCard(ctx context.Context, arg GetAllCardParams) ([]Card,
 }
 
 const getCardById = `-- name: GetCardById :one
-SELECT id, created_at, updated_at, deleted_at, is_deleted, is_active, user_id, bank_id, bank_account_id, name, nickname, number, type, expiration_date, cvv, total_limit, bill_date from cards WHERE id=$1 AND is_deleted = false
+SELECT id, created_at, updated_at, deleted_at, is_deleted, is_active, user_id, bank_id, bank_account_id, name, nickname, number, type, exp_month, exp_year, cvv, total_limit, bill_date from cards WHERE id=$1 AND is_deleted = false
 `
 
 func (q *Queries) GetCardById(ctx context.Context, id uuid.UUID) (Card, error) {
@@ -184,7 +188,8 @@ func (q *Queries) GetCardById(ctx context.Context, id uuid.UUID) (Card, error) {
 		&i.Nickname,
 		&i.Number,
 		&i.Type,
-		&i.ExpirationDate,
+		&i.ExpMonth,
+		&i.ExpYear,
 		&i.Cvv,
 		&i.TotalLimit,
 		&i.BillDate,
@@ -215,7 +220,7 @@ func (q *Queries) GetUserCardCount(ctx context.Context, userID uuid.UUID) (int64
 }
 
 const getUserCards = `-- name: GetUserCards :many
-SELECT id, created_at, updated_at, deleted_at, is_deleted, is_active, user_id, bank_id, bank_account_id, name, nickname, number, type, expiration_date, cvv, total_limit, bill_date
+SELECT id, created_at, updated_at, deleted_at, is_deleted, is_active, user_id, bank_id, bank_account_id, name, nickname, number, type, exp_month, exp_year, cvv, total_limit, bill_date
 FROM
     cards
 WHERE is_deleted = false AND user_id=$3
@@ -253,7 +258,8 @@ func (q *Queries) GetUserCards(ctx context.Context, arg GetUserCardsParams) ([]C
 			&i.Nickname,
 			&i.Number,
 			&i.Type,
-			&i.ExpirationDate,
+			&i.ExpMonth,
+			&i.ExpYear,
 			&i.Cvv,
 			&i.TotalLimit,
 			&i.BillDate,
@@ -289,26 +295,24 @@ SET updated_at = $2,
     is_active = $5,
     number = $6,
     type = $7,
-    expiration_date = $8,
-    cvv = $9,
-    name = $10,
-    nickname = $11
+    exp_month = $8,
+    exp_year = $9,
+    cvv = $10
 WHERE id = $1 AND is_deleted=false
-RETURNING id, created_at, updated_at, deleted_at, is_deleted, is_active, user_id, bank_id, bank_account_id, name, nickname, number, type, expiration_date, cvv, total_limit, bill_date
+RETURNING id, created_at, updated_at, deleted_at, is_deleted, is_active, user_id, bank_id, bank_account_id, name, nickname, number, type, exp_month, exp_year, cvv, total_limit, bill_date
 `
 
 type UpdateCardParams struct {
-	ID             uuid.UUID
-	UpdatedAt      time.Time
-	Name           string
-	Nickname       string
-	IsActive       bool
-	Number         string
-	Type           CardType
-	ExpirationDate time.Time
-	Cvv            string
-	Name_2         string
-	Nickname_2     string
+	ID        uuid.UUID
+	UpdatedAt time.Time
+	Name      string
+	Nickname  string
+	IsActive  bool
+	Number    string
+	Type      CardType
+	ExpMonth  int32
+	ExpYear   int32
+	Cvv       string
 }
 
 func (q *Queries) UpdateCard(ctx context.Context, arg UpdateCardParams) error {
@@ -320,10 +324,9 @@ func (q *Queries) UpdateCard(ctx context.Context, arg UpdateCardParams) error {
 		arg.IsActive,
 		arg.Number,
 		arg.Type,
-		arg.ExpirationDate,
+		arg.ExpMonth,
+		arg.ExpYear,
 		arg.Cvv,
-		arg.Name_2,
-		arg.Nickname_2,
 	)
 	return err
 }

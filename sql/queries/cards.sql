@@ -2,10 +2,10 @@
 INSERT INTO cards(
     id, created_at, updated_at, deleted_at, is_deleted,is_active,
     bank_id, user_id, bank_account_id, name, nickname,
-    number, type, expiration_date, cvv, total_limit, bill_date)
+    number, type, exp_month, exp_year, cvv, total_limit, bill_date)
 VALUES ($1, $2, $3, $4, $5, $6, $7,
         $8, $9, $10, $11, $12, $13,
-        $14, $15, $16, $17)
+        $14, $15, $16, $17, $18)
 RETURNING *;
 
 
@@ -45,10 +45,9 @@ SET updated_at = $2,
     is_active = $5,
     number = $6,
     type = $7,
-    expiration_date = $8,
-    cvv = $9,
-    name = $10,
-    nickname = $11
+    exp_month = $8,
+    exp_year = $9,
+    cvv = $10
 WHERE id = $1 AND is_deleted=false
 RETURNING *;
 
