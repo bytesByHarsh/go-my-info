@@ -15,9 +15,9 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-// @contact.name   Harsh Mittal
-// @contact.url
-// @contact.email  harshmittal2210@gmail.com
+//	@contact.name	Harsh Mittal
+//	@contact.url
+//	@contact.email	harshmittal2210@gmail.com
 
 func main() {
 

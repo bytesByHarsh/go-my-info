@@ -1,10 +1,71 @@
 definitions:
+  models.AuthReq:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  models.AuthResp:
+    properties:
+      access_token:
+        type: string
+    type: object
+  models.CreateUserReq:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - username
+    type: object
   models.JSONResp:
     properties:
       data: {}
       message:
         type: string
       status:
+        type: string
+    type: object
+  models.JSONerrResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      is_superuser:
+        type: boolean
+      name:
+        type: string
+      phone_number:
+        type: string
+      profile_img:
+        type: string
+      role:
+        type: integer
+      updated_at:
+        type: string
+      username:
         type: string
     type: object
 info:
@@ -25,4 +86,56 @@ paths:
       summary: Hello API
       tags:
       - Ping
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: get login token
+      parameters:
+      - description: Login Body
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/models.AuthReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.AuthResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+      summary: Login User
+      tags:
+      - Authentication
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: create new user
+      parameters:
+      - description: User Body
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateUserReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+      summary: Create User
+      tags:
+      - Users
 swagger: "2.0"

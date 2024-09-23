@@ -15,6 +15,10 @@ type JSONResp struct {
 	Data    interface{} `json:"data"`
 }
 
+type JSONerrResponse struct {
+	Error string `json:"error"`
+}
+
 func VerifyJson(data interface{}, r *http.Request) error {
 
 	if err := json.NewDecoder(r.Body).Decode(data); err != nil {

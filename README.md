@@ -10,6 +10,10 @@ Things Supported:
  - SQLC For modules generation
  - Goose for Database Migration
  - Air Integration to Test in Dev ENV
+ - Swagger Integration
+
+## Swagger (Limited)
+[http://localhost:8000/swagger/index.html](http://localhost:8000/swagger/index.html)
 
 ### Setup
 
@@ -49,5 +53,7 @@ air
 ## Generate Swagger Documentation
 
 ```bash
+go install github.com/swaggo/swag/cmd/swag@latest
 swag init -o './api' -g './cmd/main.go'
+swag fmt
 ```
