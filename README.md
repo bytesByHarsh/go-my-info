@@ -1,5 +1,7 @@
 # My Info Backend
 
+<img align="right" width="180px" src="https://github.com/bytesByHarsh/go-my-info/tree/master/docs/assets/logo.png">
+
 Written in `Go` for Reduces Latency.
 
 Things Supported:
