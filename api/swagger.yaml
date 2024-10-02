@@ -34,6 +34,21 @@ definitions:
       total_count:
         type: integer
     type: object
+  github_com_bytesByHarsh_go-my-info_models.PaginatedListResp-models_User:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+      has_more:
+        type: boolean
+      items_per_page:
+        type: integer
+      page:
+        type: integer
+      total_count:
+        type: integer
+    type: object
   models.AuthReq:
     properties:
       password:
@@ -91,6 +106,27 @@ definitions:
     - established_year
     - name
     type: object
+  models.CreateUserByAdminReq:
+    properties:
+      email:
+        type: string
+      is_active:
+        type: boolean
+      is_superuser:
+        type: boolean
+      name:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - is_active
+    - name
+    - password
+    - username
+    type: object
   models.CreateUserReq:
     properties:
       email:
@@ -119,6 +155,32 @@ definitions:
     properties:
       error:
         type: string
+    type: object
+  models.UpdatePasswordReq:
+    properties:
+      password:
+        type: string
+    required:
+    - password
+    type: object
+  models.UpdateUserReq:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      phone_num:
+        type: string
+      profile_img:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - name
+    - phone_num
+    - profile_img
+    - username
     type: object
   models.User:
     properties:
@@ -219,6 +281,141 @@ paths:
       summary: Create Bank
       tags:
       - Bank
+  /users/{username}:
+    delete:
+      consumes:
+      - application/json
+      description: delete user from db by admin
+      parameters:
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+      summary: Delete user from DB
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: get another user details
+      parameters:
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+      summary: Get User
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: create new user by admin
+      parameters:
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
+      - description: User Body
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateUserReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+      summary: Create User By Admin
+      tags:
+      - Users
+  /users/add:
+    post:
+      consumes:
+      - application/json
+      description: create new user by admin
+      parameters:
+      - description: User Body
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateUserByAdminReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+      summary: Create User By Admin
+      tags:
+      - Users
+  /users/list:
+    get:
+      consumes:
+      - application/json
+      description: user list
+      parameters:
+      - description: Page Number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Items Per Page
+        in: query
+        name: items_per_page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_bytesByHarsh_go-my-info_models.PaginatedListResp-models_User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+      summary: Get User List
+      tags:
+      - Users
   /users/login:
     post:
       consumes:
@@ -245,6 +442,94 @@ paths:
       summary: Login User
       tags:
       - Authentication
+  /users/me:
+    delete:
+      consumes:
+      - application/json
+      description: delete user
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+      summary: Delete user
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: get user details
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+      summary: Get User
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: update user details
+      parameters:
+      - description: User Body
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateUserReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+      summary: update User
+      tags:
+      - Users
+  /users/me/password:
+    put:
+      consumes:
+      - application/json
+      description: update user password
+      parameters:
+      - description: Password Body
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdatePasswordReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+      summary: Update User Password
+      tags:
+      - Users
   /users/register:
     post:
       consumes:
