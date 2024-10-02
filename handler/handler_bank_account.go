@@ -12,6 +12,17 @@ import (
 	"github.com/google/uuid"
 )
 
+// AddAccount godoc
+//
+//	@Summary		Create Account
+//	@Description	create new bank account
+//	@Tags			Bank Accounts
+//	@Accept			json
+//	@Produce		json
+//	@Param			account	body		models.AddBankAccountReq	true	"Bank Account Body"
+//	@Success		201		{object}	models.BankAccount
+//	@Failure		400		{object}	models.JSONerrResponse
+//	@Router			/accounts/ [post]
 func AddAccount(w http.ResponseWriter, r *http.Request, user database.User) {
 	params := models.AddBankAccountReq{}
 
@@ -23,6 +34,15 @@ func AddAccount(w http.ResponseWriter, r *http.Request, user database.User) {
 		return
 	}
 
+	bankId, err := uuid.Parse(params.BankID)
+
+	if err != nil {
+		responseWithError(w, http.StatusBadRequest,
+			fmt.Sprintf("Error parsing Bank UUID: %v", err),
+		)
+		return
+	}
+
 	dbBankAccount, err := apiCfg.DB.CreateBankAccount(r.Context(), database.CreateBankAccountParams{
 		ID:            uuid.New(),
 		CreatedAt:     time.Now().UTC(),
@@ -30,7 +50,7 @@ func AddAccount(w http.ResponseWriter, r *http.Request, user database.User) {
 		DeletedAt:     sql.NullTime{},
 		IsDeleted:     false,
 		Name:          params.Name,
-		BankID:        params.BankID,
+		BankID:        bankId,
 		AccountNumber: params.AccountNumber,
 		AccountType:   database.BankAccountType(params.AccountType),
 		Balance:       params.Balance,
@@ -51,6 +71,17 @@ func AddAccount(w http.ResponseWriter, r *http.Request, user database.User) {
 	responseWithJson(w, 201, resp)
 }
 
+// GetAccount godoc
+//
+//	@Summary		Get Account
+//	@Description	get bank account details
+//	@Tags			Bank Accounts
+//	@Accept			json
+//	@Produce		json
+//	@Param			account_id	path		string	true	"Bank Account ID"
+//	@Success		201			{object}	models.BankAccount
+//	@Failure		400			{object}	models.JSONerrResponse
+//	@Router			/accounts/{account_id} [get]
 func GetAccount(w http.ResponseWriter, r *http.Request, user database.User) {
 	account_id_str := chi.URLParam(r, "account_id")
 	account_id, err := uuid.Parse(account_id_str)
@@ -71,6 +102,18 @@ func GetAccount(w http.ResponseWriter, r *http.Request, user database.User) {
 	responseWithJson(w, http.StatusOK, models.ConvAccountToAccount(dbAccount))
 }
 
+// UpdateAccount godoc
+//
+//	@Summary		Update Account
+//	@Description	update bank account details
+//	@Tags			Bank Accounts
+//	@Accept			json
+//	@Produce		json
+//	@Param			account_id	path		string						true	"Bank Account ID"
+//	@Param			account		body		models.UpdateBankAccountReq	true	"Bank Account Body"
+//	@Success		201			{object}	models.JSONerrResponse
+//	@Failure		400			{object}	models.JSONerrResponse
+//	@Router			/accounts/{account_id} [put]
 func UpdateAccount(w http.ResponseWriter, r *http.Request, user database.User) {
 	account_id_str := chi.URLParam(r, "account_id")
 	account_id, err := uuid.Parse(account_id_str)
@@ -109,6 +152,18 @@ func UpdateAccount(w http.ResponseWriter, r *http.Request, user database.User) {
 	responseWithJson(w, http.StatusAccepted, resp)
 }
 
+// GetAllAccounts godoc
+//
+//	@Summary		Get All Account
+//	@Description	get all bank account
+//	@Tags			Bank Accounts
+//	@Accept			json
+//	@Produce		json
+//	@Param			page			query		int32	true	"Page Number"
+//	@Param			items_per_page	query		int32	true	"Items Per Page"
+//	@Success		200				{object}	models.PaginatedListResp[models.BankAccount]
+//	@Failure		400				{object}	models.JSONerrResponse
+//	@Router			/accounts/ [get]
 func GetAllAccounts(w http.ResponseWriter, r *http.Request, user database.User) {
 	page, items_per_page, err := parsePaginatedReq(r)
 	if err != nil {

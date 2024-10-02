@@ -35,7 +35,7 @@ func SetupRoutes(app *chi.Mux) {
 
 	// Bank Account
 	accountRouter := chi.NewRouter()
-	accountRouter.Post("/", handler.MiddlewareAuth(handler.CreateBank))
+	accountRouter.Post("/", handler.MiddlewareAuth(handler.AddAccount))
 	accountRouter.Get("/", handler.MiddlewareAuth(handler.GetAllAccounts))
 	accountRouter.Get("/{account_id}", handler.MiddlewareAuth(handler.GetAccount))
 	accountRouter.Put("/{account_id}", handler.MiddlewareAuth(handler.UpdateAccount))

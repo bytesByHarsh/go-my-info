@@ -34,6 +34,21 @@ definitions:
       total_count:
         type: integer
     type: object
+  github_com_bytesByHarsh_go-my-info_models.PaginatedListResp-models_BankAccount:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.BankAccount'
+        type: array
+      has_more:
+        type: boolean
+      items_per_page:
+        type: integer
+      page:
+        type: integer
+      total_count:
+        type: integer
+    type: object
   github_com_bytesByHarsh_go-my-info_models.PaginatedListResp-models_User:
     properties:
       data:
@@ -48,6 +63,28 @@ definitions:
         type: integer
       total_count:
         type: integer
+    type: object
+  models.AddBankAccountReq:
+    properties:
+      account_number:
+        type: string
+      account_type:
+        type: string
+      balance:
+        type: string
+      bank_id:
+        type: string
+      currency:
+        type: string
+      name:
+        type: string
+    required:
+    - account_number
+    - account_type
+    - balance
+    - bank_id
+    - currency
+    - name
     type: object
   models.AuthReq:
     properties:
@@ -78,6 +115,25 @@ definitions:
         type: string
       established_year:
         type: integer
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.BankAccount:
+    properties:
+      account_number:
+        type: string
+      account_type:
+        type: string
+      balance:
+        type: string
+      created_at:
+        type: string
+      currency:
+        type: string
       id:
         type: string
       name:
@@ -156,6 +212,25 @@ definitions:
       error:
         type: string
     type: object
+  models.UpdateBankAccountReq:
+    properties:
+      account_number:
+        type: string
+      account_type:
+        type: string
+      balance:
+        type: string
+      currency:
+        type: string
+      name:
+        type: string
+    required:
+    - account_number
+    - account_type
+    - balance
+    - currency
+    - name
+    type: object
   models.UpdatePasswordReq:
     properties:
       password:
@@ -225,6 +300,116 @@ paths:
       summary: Hello API
       tags:
       - Ping
+  /accounts/:
+    get:
+      consumes:
+      - application/json
+      description: get all bank account
+      parameters:
+      - description: Page Number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Items Per Page
+        in: query
+        name: items_per_page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_bytesByHarsh_go-my-info_models.PaginatedListResp-models_BankAccount'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+      summary: Get All Account
+      tags:
+      - Bank Accounts
+    post:
+      consumes:
+      - application/json
+      description: create new bank account
+      parameters:
+      - description: Bank Account Body
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddBankAccountReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.BankAccount'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+      summary: Create Account
+      tags:
+      - Bank Accounts
+  /accounts/{account_id}:
+    get:
+      consumes:
+      - application/json
+      description: get bank account details
+      parameters:
+      - description: Bank Account ID
+        in: path
+        name: account_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.BankAccount'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+      summary: Get Account
+      tags:
+      - Bank Accounts
+    put:
+      consumes:
+      - application/json
+      description: update bank account details
+      parameters:
+      - description: Bank Account ID
+        in: path
+        name: account_id
+        required: true
+        type: string
+      - description: Bank Account Body
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateBankAccountReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+      summary: Update Account
+      tags:
+      - Bank Accounts
   /banks/list:
     get:
       consumes:
