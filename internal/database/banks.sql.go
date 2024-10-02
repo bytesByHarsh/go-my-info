@@ -160,6 +160,29 @@ func (q *Queries) GetBankById(ctx context.Context, id uuid.UUID) (Bank, error) {
 	return i, err
 }
 
+const getBankByName = `-- name: GetBankByName :one
+SELECT id, created_at, updated_at, deleted_at, is_deleted, name, contact_phone, contact_email, address, type, established_year from banks WHERE name=$1 AND is_deleted = false LIMIT 1
+`
+
+func (q *Queries) GetBankByName(ctx context.Context, name string) (Bank, error) {
+	row := q.db.QueryRowContext(ctx, getBankByName, name)
+	var i Bank
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.IsDeleted,
+		&i.Name,
+		&i.ContactPhone,
+		&i.ContactEmail,
+		&i.Address,
+		&i.Type,
+		&i.EstablishedYear,
+	)
+	return i, err
+}
+
 const getBankCount = `-- name: GetBankCount :one
 SELECT COUNT(*) FROM banks WHERE is_deleted=false
 `

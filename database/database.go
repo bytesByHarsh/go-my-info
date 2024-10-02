@@ -26,6 +26,7 @@ func ConnectDb() error {
 	handler.UpdateDB(DB)
 
 	InitDb()
+	InitBankDb()
 
 	return nil
 }

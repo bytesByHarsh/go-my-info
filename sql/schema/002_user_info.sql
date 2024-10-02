@@ -14,7 +14,7 @@ CREATE TABLE banks (
     deleted_at TIMESTAMPTZ DEFAULT NULL,
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
     name VARCHAR(100) NOT NULL UNIQUE,
-    contact_phone VARCHAR(15),
+    contact_phone VARCHAR(30),
     contact_email VARCHAR(255) UNIQUE NOT NULL,
     address TEXT,
     type bank_type NOT NULL,

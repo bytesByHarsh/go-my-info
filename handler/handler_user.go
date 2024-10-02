@@ -75,6 +75,17 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	responseWithJson(w, 201, resp)
 }
 
+// CreateUserByAdmin godoc
+//
+//	@Summary		Create User By Admin
+//	@Description	create new user by admin
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		models.CreateUserByAdminReq	true	"User Body"
+//	@Success		201		{object}	models.User
+//	@Failure		400		{object}	models.JSONerrResponse
+//	@Router			/users/add [post]
 func CreateUserByAdmin(w http.ResponseWriter, r *http.Request, user database.User) {
 	if user.Role != UserRole_Admin {
 		responseWithError(w, http.StatusUnauthorized,
@@ -133,10 +144,31 @@ func CreateUserByAdmin(w http.ResponseWriter, r *http.Request, user database.Use
 
 }
 
+// GetUser godoc
+//
+//	@Summary		Get User
+//	@Description	get user details
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	models.User
+//	@Failure		400	{object}	models.JSONerrResponse
+//	@Router			/users/me [get]
 func GetUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	responseWithJson(w, http.StatusOK, models.ConvUserToUser(user))
 }
 
+// GetAnotherUser godoc
+//
+//	@Summary		Get User
+//	@Description	get another user details
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			username	path		string	true	"Username"
+//	@Success		200			{object}	models.User
+//	@Failure		400			{object}	models.JSONerrResponse
+//	@Router			/users/{username} [get]
 func GetAnotherUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	username := chi.URLParam(r, "username")
 	userDb, err := apiCfg.DB.GetUserByUsername(r.Context(), username)
@@ -149,6 +181,18 @@ func GetAnotherUser(w http.ResponseWriter, r *http.Request, user database.User) 
 	responseWithJson(w, http.StatusOK, models.ConvUserToUser(userDb))
 }
 
+// GetUserList godoc
+//
+//	@Summary		Get User List
+//	@Description	user list
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			page			query		int32	true	"Page Number"
+//	@Param			items_per_page	query		int32	true	"Items Per Page"
+//	@Success		200				{object}	models.PaginatedListResp[models.User]
+//	@Failure		400				{object}	models.JSONerrResponse
+//	@Router			/users/list [get]
 func GetUserList(w http.ResponseWriter, r *http.Request, user database.User) {
 	if user.Role != UserRole_Admin {
 		responseWithError(w, http.StatusUnauthorized,
@@ -195,6 +239,17 @@ func GetUserList(w http.ResponseWriter, r *http.Request, user database.User) {
 	responseWithJson(w, http.StatusOK, resp)
 }
 
+// UpdateUser godoc
+//
+//	@Summary		update User
+//	@Description	update user details
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		models.UpdateUserReq	true	"User Body"
+//	@Success		201		{object}	models.JSONerrResponse
+//	@Failure		400		{object}	models.JSONerrResponse
+//	@Router			/users/me [put]
 func UpdateUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	params := models.UpdateUserReq{}
 
@@ -231,6 +286,19 @@ func UpdateUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	}
 	responseWithJson(w, http.StatusAccepted, resp)
 }
+
+// UpdateAnotherUser godoc
+//
+//	@Summary		Create User By Admin
+//	@Description	create new user by admin
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			username	path		string					true	"Username"
+//	@Param			user		body		models.UpdateUserReq	true	"User Body"
+//	@Success		201			{object}	models.JSONerrResponse
+//	@Failure		400			{object}	models.JSONerrResponse
+//	@Router			/users/{username} [post]
 func UpdateAnotherUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	if user.Role != UserRole_Admin {
 		responseWithError(w, http.StatusUnauthorized,
@@ -283,6 +351,17 @@ func UpdateAnotherUser(w http.ResponseWriter, r *http.Request, user database.Use
 	responseWithJson(w, http.StatusAccepted, resp)
 }
 
+// UpdateUserPassword godoc
+//
+//	@Summary		Update User Password
+//	@Description	update user password
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			password	body		models.UpdatePasswordReq	true	"Password Body"
+//	@Success		201			{object}	models.JSONerrResponse
+//	@Failure		400			{object}	models.JSONerrResponse
+//	@Router			/users/me/password [put]
 func UpdateUserPassword(w http.ResponseWriter, r *http.Request, user database.User) {
 	params := models.UpdatePasswordReq{}
 
@@ -315,6 +394,16 @@ func UpdateUserPassword(w http.ResponseWriter, r *http.Request, user database.Us
 	responseWithJson(w, http.StatusAccepted, resp)
 }
 
+// DeleteUser godoc
+//
+//	@Summary		Delete user
+//	@Description	delete user
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Success		201	{object}	models.JSONerrResponse
+//	@Failure		400	{object}	models.JSONerrResponse
+//	@Router			/users/me [delete]
 func DeleteUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	err := apiCfg.DB.DeleteUser(r.Context(), database.DeleteUserParams{
 		ID:        user.ID,
@@ -336,6 +425,17 @@ func DeleteUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	responseWithJson(w, http.StatusAccepted, resp)
 }
 
+// DbDeleteUser godoc
+//
+//	@Summary		Delete user from DB
+//	@Description	delete user from db by admin
+//	@Tags			Users
+//	@Accept			json
+//	@Produce		json
+//	@Param			username	path		string	true	"Username"
+//	@Success		201			{object}	models.JSONerrResponse
+//	@Failure		400			{object}	models.JSONerrResponse
+//	@Router			/users/{username} [delete]
 func DbDeleteUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	if user.Role < UserRole_Admin {
 		responseWithError(w, http.StatusUnauthorized,

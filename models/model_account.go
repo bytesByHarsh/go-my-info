@@ -8,12 +8,12 @@ import (
 )
 
 type AddBankAccountReq struct {
-	BankID        uuid.UUID `json:"bank_id"  validate:"required"`
-	AccountNumber string    `json:"account_number"  validate:"required"`
-	AccountType   string    `json:"account_type"  validate:"required"`
-	Name          string    `json:"name"  validate:"required"`
-	Balance       string    `json:"balance"  validate:"required"`
-	Currency      string    `json:"currency"  validate:"required"`
+	BankID        string `json:"bank_id"  validate:"required"`
+	AccountNumber string `json:"account_number"  validate:"required"`
+	AccountType   string `json:"account_type"  validate:"required"`
+	Name          string `json:"name"  validate:"required"`
+	Balance       string `json:"balance"  validate:"required"`
+	Currency      string `json:"currency"  validate:"required"`
 }
 
 type UpdateBankAccountReq struct {

@@ -17,6 +17,12 @@ Things Supported:
 ## Swagger (Limited)
 [http://localhost:8000/swagger/index.html](http://localhost:8000/swagger/index.html)
 
+![Swagger Documentation](/docs/assets/swagger_1.png)
+
+![Swagger Documentation](/docs/assets/swagger_2.png)
+
+![Swagger Documentation of Models](/docs/assets/swagger_3.png)
+
 ### Setup
 
 ```bash
@@ -56,6 +62,6 @@ air
 
 ```bash
 go install github.com/swaggo/swag/cmd/swag@latest
-swag init -o './api' -g './cmd/main.go'
+swag init -o './api' -g './cmd/main.go' --parseDependency
 swag fmt
 ```

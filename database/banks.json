@@ -1,0 +1,82 @@
+[
+    {
+        "name": "Bank of America",
+        "contact_phone": "+1-800-432-1000",
+        "contact_email": "contact@bankofamerica.com",
+        "address": "123 Main St, New York, NY",
+        "type": "commercial",
+        "established_year": 1904
+    },
+    {
+        "name": "Chase Bank",
+        "contact_phone": "+1-800-935-9935",
+        "contact_email": "support@chase.com",
+        "address": "456 Wall St, New York, NY",
+        "type": "cooperative",
+        "established_year": 1799
+    },
+    {
+        "name": "Wells Fargo",
+        "contact_phone": "+1-800-869-3557",
+        "contact_email": "help@wellsfargo.com",
+        "address": "San Francisco, California",
+        "type": "commercial",
+        "established_year": 1852
+    },
+    {
+        "name": "HSBC",
+        "contact_phone": "+44 1226 261 010",
+        "contact_email": "customer.service@hsbc.com",
+        "address": "8 Canada Square, London, UK",
+        "type": "commercial",
+        "established_year": 1865
+    },
+    {
+        "name": "Barclays",
+        "contact_phone": "+44 345 734 5345",
+        "contact_email": "customersupport@barclays.co.uk",
+        "address": "1 Churchill Place, London, UK",
+        "type": "cooperative",
+        "established_year": 1690
+    },
+    {
+        "name": "Deutsche Bank",
+        "contact_phone": "+49 69 91000",
+        "contact_email": "contact@db.com",
+        "address": "Taunusanlage 12, Frankfurt, Germany",
+        "type": "commercial",
+        "established_year": 1870
+    },
+    {
+        "name": "State Bank of India",
+        "contact_phone": "+91 80 26599990",
+        "contact_email": "contactcentre@sbi.co.in",
+        "address": "State Bank Bhavan, Nariman Point, Mumbai, India",
+        "type": "central",
+        "established_year": 1955
+    },
+    {
+        "name": "HDFC Bank",
+        "contact_phone": "+91 22 61606161",
+        "contact_email": "support@hdfcbank.com",
+        "address": "HDFC Bank House, Mumbai, India",
+        "type": "cooperative",
+        "established_year": 1994
+    },
+    {
+        "name": "ICICI Bank",
+        "contact_phone": "+91 22 33667777",
+        "contact_email": "customercare@icicibank.com",
+        "address": "ICICI Towers, Bandra-Kurla Complex, Mumbai, India",
+        "type": "commercial",
+        "established_year": 1994
+    },
+    {
+        "name": "Axis Bank",
+        "contact_phone": "+91 22 67987700",
+        "contact_email": "customer.services@axisbank.com",
+        "address": "Axis House, Mumbai, India",
+        "type": "commercial",
+        "established_year": 1993
+    }
+]

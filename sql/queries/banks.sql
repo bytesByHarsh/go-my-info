@@ -6,6 +6,8 @@ INSERT INTO banks(
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 RETURNING *;
 
+-- name: GetBankByName :one
+SELECT * from banks WHERE name=$1 AND is_deleted = false LIMIT 1;
 
 -- name: GetBankById :one
 SELECT * from banks WHERE id=$1 AND is_deleted = false;
