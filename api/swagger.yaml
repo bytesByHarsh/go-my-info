@@ -1,4 +1,39 @@
 definitions:
+  github_com_bytesByHarsh_go-my-info_internal_database.BankType:
+    enum:
+    - central
+    - cooperative
+    - commercial
+    - regional
+    - local
+    - specialized
+    - small_finance
+    - payments
+    type: string
+    x-enum-varnames:
+    - BankTypeCentral
+    - BankTypeCooperative
+    - BankTypeCommercial
+    - BankTypeRegional
+    - BankTypeLocal
+    - BankTypeSpecialized
+    - BankTypeSmallFinance
+    - BankTypePayments
+  github_com_bytesByHarsh_go-my-info_models.PaginatedListResp-models_Bank:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Bank'
+        type: array
+      has_more:
+        type: boolean
+      items_per_page:
+        type: integer
+      page:
+        type: integer
+      total_count:
+        type: integer
+    type: object
   models.AuthReq:
     properties:
       password:
@@ -13,6 +48,48 @@ definitions:
     properties:
       access_token:
         type: string
+    type: object
+  models.Bank:
+    properties:
+      address:
+        type: string
+      bank_type:
+        $ref: '#/definitions/github_com_bytesByHarsh_go-my-info_internal_database.BankType'
+      contact_email:
+        type: string
+      contact_phone:
+        type: string
+      created_at:
+        type: string
+      established_year:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.CreateBankReq:
+    properties:
+      address:
+        type: string
+      bank_type:
+        $ref: '#/definitions/github_com_bytesByHarsh_go-my-info_internal_database.BankType'
+      contact_email:
+        type: string
+      contact_phone:
+        type: string
+      established_year:
+        type: integer
+      name:
+        type: string
+    required:
+    - address
+    - bank_type
+    - contact_email
+    - established_year
+    - name
     type: object
   models.CreateUserReq:
     properties:
@@ -86,6 +163,62 @@ paths:
       summary: Hello API
       tags:
       - Ping
+  /banks/list:
+    get:
+      consumes:
+      - application/json
+      description: get all bank list
+      parameters:
+      - description: Page Number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Items Per Page
+        in: query
+        name: items_per_page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_bytesByHarsh_go-my-info_models.PaginatedListResp-models_Bank'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+      summary: Get Bank List
+      tags:
+      - Bank
+  /banks/register:
+    post:
+      consumes:
+      - application/json
+      description: create a new bank
+      parameters:
+      - description: Create Bank Body
+        in: body
+        name: page
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateBankReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Bank'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.JSONerrResponse'
+      summary: Create Bank
+      tags:
+      - Bank
   /users/login:
     post:
       consumes:

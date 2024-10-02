@@ -12,6 +12,17 @@ import (
 	"github.com/google/uuid"
 )
 
+// CreateBank godoc
+//
+//	@Summary		Create Bank
+//	@Description	create a new bank
+//	@Tags			Bank
+//	@Accept			json
+//	@Produce		json
+//	@Param			page	body		models.CreateBankReq	true	"Create Bank Body"
+//	@Success		201		{object}	models.Bank
+//	@Failure		400		{object}	models.JSONerrResponse
+//	@Router			/banks/register [post]
 func CreateBank(w http.ResponseWriter, r *http.Request, user database.User) {
 	if user.Role != UserRole_Admin {
 		responseWithError(w, http.StatusUnauthorized,
@@ -69,6 +80,18 @@ func CreateBank(w http.ResponseWriter, r *http.Request, user database.User) {
 	responseWithJson(w, 201, resp)
 }
 
+// GetBankList godoc
+//
+//	@Summary		Get Bank List
+//	@Description	get all bank list
+//	@Tags			Bank
+//	@Accept			json
+//	@Produce		json
+//	@Param			page			query		int32	true	"Page Number"
+//	@Param			items_per_page	query		int32	true	"Items Per Page"
+//	@Success		200				{object}	models.PaginatedListResp[models.Bank]
+//	@Failure		400				{object}	models.JSONerrResponse
+//	@Router			/banks/list [get]
 func GetBankList(w http.ResponseWriter, r *http.Request) {
 	page, items_per_page, err := parsePaginatedReq(r)
 	if err != nil {

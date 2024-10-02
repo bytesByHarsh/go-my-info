@@ -1,4 +1,7 @@
 # Go My Information Backend API
+
+<img align="right" width="180px" src="https://github.com/bytesByHarsh/go-my-info/blob/master/docs/assets/logo.png?raw=true">
+
 Simple Backend Application Written in `Go` to user personal account and cards details.
 
 Things Supported:
@@ -16,11 +19,10 @@ Things Supported:
 - Encryption & Decryption Support
 - Multiple APIs for different uses
 
-<img align="right" width="180px" src="https://github.com/bytesByHarsh/go-my-info/blob/master/docs/assets/logo.png?raw=true">
 
 ## Setup
 
->> Note: Make sure you have create a database in Postgres called `go_my_info`
+> Note: Make sure you have create a database in Postgres called `go_my_info`
 
 ```bash
 go mod tidy

@@ -33,6 +33,8 @@ func VerifyJson(data interface{}, r *http.Request) error {
 	return nil
 }
 
+// PaginatedListResp[T]
+// @Description Paginates List Response
 type PaginatedListResp[T any] struct {
 	Data         []T  `json:"data"`
 	TotalCount   int  `json:"total_count"`

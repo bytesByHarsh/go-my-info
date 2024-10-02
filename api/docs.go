@@ -38,6 +38,91 @@ const docTemplate = `{
                 }
             }
         },
+        "/banks/list": {
+            "get": {
+                "description": "get all bank list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bank"
+                ],
+                "summary": "Get Bank List",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page Number",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Items Per Page",
+                        "name": "items_per_page",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_bytesByHarsh_go-my-info_models.PaginatedListResp-models_Bank"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.JSONerrResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/banks/register": {
+            "post": {
+                "description": "create a new bank",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bank"
+                ],
+                "summary": "Create Bank",
+                "parameters": [
+                    {
+                        "description": "Create Bank Body",
+                        "name": "page",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateBankReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Bank"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.JSONerrResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/users/login": {
             "post": {
                 "description": "get login token",
@@ -120,6 +205,52 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "github_com_bytesByHarsh_go-my-info_internal_database.BankType": {
+            "type": "string",
+            "enum": [
+                "central",
+                "cooperative",
+                "commercial",
+                "regional",
+                "local",
+                "specialized",
+                "small_finance",
+                "payments"
+            ],
+            "x-enum-varnames": [
+                "BankTypeCentral",
+                "BankTypeCooperative",
+                "BankTypeCommercial",
+                "BankTypeRegional",
+                "BankTypeLocal",
+                "BankTypeSpecialized",
+                "BankTypeSmallFinance",
+                "BankTypePayments"
+            ]
+        },
+        "github_com_bytesByHarsh_go-my-info_models.PaginatedListResp-models_Bank": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Bank"
+                    }
+                },
+                "has_more": {
+                    "type": "boolean"
+                },
+                "items_per_page": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total_count": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.AuthReq": {
             "type": "object",
             "required": [
@@ -139,6 +270,68 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "access_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Bank": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "bank_type": {
+                    "$ref": "#/definitions/github_com_bytesByHarsh_go-my-info_internal_database.BankType"
+                },
+                "contact_email": {
+                    "type": "string"
+                },
+                "contact_phone": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "established_year": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreateBankReq": {
+            "type": "object",
+            "required": [
+                "address",
+                "bank_type",
+                "contact_email",
+                "established_year",
+                "name"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "bank_type": {
+                    "$ref": "#/definitions/github_com_bytesByHarsh_go-my-info_internal_database.BankType"
+                },
+                "contact_email": {
+                    "type": "string"
+                },
+                "contact_phone": {
+                    "type": "string"
+                },
+                "established_year": {
+                    "type": "integer"
+                },
+                "name": {
                     "type": "string"
                 }
             }

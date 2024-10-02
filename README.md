@@ -56,6 +56,6 @@ air
 
 ```bash
 go install github.com/swaggo/swag/cmd/swag@latest
-swag init -o './api' -g './cmd/main.go'
+swag init -o './api' -g './cmd/main.go' --parseDependency
 swag fmt
 ```
