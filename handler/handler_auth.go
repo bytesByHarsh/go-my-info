@@ -135,14 +135,10 @@ func MiddlewareAuth(handler authHandler) http.HandlerFunc {
 			responseWithError(w, http.StatusBadRequest, "incorrect token")
 			return
 		}
-		claims, err := token.AsMap(r.Context())
-		if err != nil {
-			responseWithError(w, http.StatusBadRequest, "incorrect token")
-			return
-		}
-
-		username, _ := claims["username"].(string)
-		timeStr, _ := claims["time"].(string)
+		var username string
+		var timeStr string
+		token.Get("username", &username)
+		token.Get("time", &timeStr)
 
 		expTime, _ := strconv.Atoi(timeStr)
 		if uint64(time.Now().UTC().Unix()) > uint64(expTime) {
